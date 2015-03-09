@@ -43,6 +43,7 @@ public class ColourSpace implements Cloneable {
 	}
 
 	public Color generateColour(float gradientVal) {
+		normaliseGradientVal(gradientVal);
 		if (pointList.size() > 2) {
 			int count = 0;
 			double segmentCount = 0d;
@@ -64,6 +65,15 @@ public class ColourSpace implements Cloneable {
 		int green = startPoint.getGreen() + Math.round((endPoint.getGreen() - startPoint.getGreen()) * gradientVal);
 		int blue = startPoint.getBlue() + Math.round((endPoint.getBlue() - startPoint.getBlue()) * gradientVal);
 		return new Color(red, green, blue);
+	}
+	
+	private float normaliseGradientVal(float gradientVal) {
+		gradientVal *= pointList.size() - 1;
+		gradientVal = gradientVal % 2;
+		if (gradientVal > 1) {
+			gradientVal = 2 - gradientVal;
+		}
+		return gradientVal;
 	}
 
 	public void reversePoints() {

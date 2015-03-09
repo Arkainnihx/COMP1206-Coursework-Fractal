@@ -6,13 +6,13 @@ import java.awt.image.BufferedImage;
 public class Mandelbrot extends Fractal {
 
 	public BufferedImage generate(int imageWidth, int imageHeight, int iterations) {
-		double widthConstant = pixelConstant(imageWidth, realUB, realLB);
-		double heightConstant = pixelConstant(imageHeight, imaginaryUB, imaginaryLB);
+		widthConstant = pixelConstant(imageWidth, realUB, realLB);
+		heightConstant = pixelConstant(imageHeight, imaginaryUB, imaginaryLB);
 		BufferedImage image = new BufferedImage(imageWidth, imageHeight, BufferedImage.TYPE_INT_ARGB);
 		int xCount = 0, yCount = 0;
-		for (yCount = 0; yCount < imageHeight; yCount++) {
+		for (yCount = imageHeight - 1; yCount >= 0; yCount--) {
 			for (xCount = 0; xCount < imageWidth; xCount++) {
-				Complex mathsPoint = new Complex(realLB + (widthConstant * xCount), imaginaryLB + (heightConstant * yCount));
+				Complex mathsPoint = imagePointToComplex(xCount, yCount);
 				image.setRGB(xCount, yCount, point(mathsPoint, iterations).getRGB());
 			}
 		}
@@ -22,7 +22,7 @@ public class Mandelbrot extends Fractal {
 	private Color point(Complex c, int iterations) {
 		Complex z = new Complex(c.getReal(), c.getImaginary());
 		int count = 0;
-		while (Math.sqrt(z.modulusSquared()) < 2 && count < iterations) {
+		while (z.modulusSquared() < 4 && count < iterations) {
 			z = z.square().add(c);
 			count++;
 		}
