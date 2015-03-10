@@ -34,12 +34,37 @@ public class Complex {
 		return new Complex(sReal, sImaginary);
 	}
 	
+	public Complex mulitplyBy(Complex mult) {
+		double mReal, mImaginary;
+		mReal = (this.real * mult.real) - (this.imaginary * mult.imaginary);
+		mImaginary = (this.real * mult.imaginary) + (mult.real * this.imaginary);
+		return new Complex (mReal, mImaginary);
+	}
+	
+	public Complex pow(int power) {
+		if (power == 1) {
+			return this;
+		}
+		if (power == 2) {
+			return this.square();
+		}
+		Complex cPow = this.square();
+		for (int count = 3; count <= power; count++) {
+			cPow = cPow.mulitplyBy(this);
+		}
+		return cPow;
+	}
+	
 	public double modulusSquared() {
 		return (real * real) + (imaginary * imaginary);
 	}
 	
 	public Complex add(Complex d) {
 		return new Complex(real + d.real, imaginary + d.imaginary);
+	}
+	
+	public Complex conjugate() {
+		return new Complex(real, -imaginary);
 	}
 	
 }

@@ -31,6 +31,13 @@ public abstract class Fractal {
 		this.realLB = realLB;
 		this.imaginaryUB = imaginaryUB;
 		this.imaginaryLB = imaginaryLB;
+		calculateConstants();
+	}
+	
+	public void setImageSize(int imageWidth, int imageHeight) {
+		this.imageWidth = imageWidth;
+		this.imageHeight = imageHeight;
+		calculateConstants();
 	}
 	
 	public double getWidthConstant() {
@@ -41,9 +48,7 @@ public abstract class Fractal {
 		return heightConstant;
 	}
 
-	public void setImageConstraints(int imageWidth, int imageHeight) {
-		this.imageWidth = imageWidth;
-		this.imageHeight = imageHeight;
+	private void calculateConstants() {
 		widthConstant = pixelConstant(imageWidth, realUB, realLB);
 		heightConstant = pixelConstant(imageHeight, imaginaryUB, imaginaryLB);
 	}
