@@ -5,9 +5,7 @@ import java.awt.image.BufferedImage;
 
 public class Mandelbrot extends Fractal {
 
-	public BufferedImage generate(int imageWidth, int imageHeight, int iterations) {
-		widthConstant = pixelConstant(imageWidth, realUB, realLB);
-		heightConstant = pixelConstant(imageHeight, imaginaryUB, imaginaryLB);
+	public BufferedImage generate(int iterations) {
 		BufferedImage image = new BufferedImage(imageWidth, imageHeight, BufferedImage.TYPE_INT_ARGB);
 		int xCount = 0, yCount = 0;
 		for (yCount = imageHeight - 1; yCount >= 0; yCount--) {

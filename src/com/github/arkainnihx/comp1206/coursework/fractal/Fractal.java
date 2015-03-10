@@ -1,10 +1,12 @@
 package com.github.arkainnihx.comp1206.coursework.fractal;
 
 import java.awt.Color;
+import java.awt.image.BufferedImage;
 
 public abstract class Fractal {
 
 	protected double realUB = 2d, realLB = -2d, imaginaryUB = 1.6d, imaginaryLB = -1.6d, widthConstant = 0d, heightConstant = 0d;
+	protected int imageWidth = 0, imageHeight = 0;
 	protected ColourSpace gradient = new ColourSpace(Color.BLACK, Color.ORANGE, Color.WHITE, Color.BLUE, new Color(0, 0, 64));
 	protected boolean blackSet = false;
 
@@ -39,7 +41,9 @@ public abstract class Fractal {
 		return heightConstant;
 	}
 
-	public void setConversionConstants(int imageWidth, int imageHeight) {
+	public void setImageConstraints(int imageWidth, int imageHeight) {
+		this.imageWidth = imageWidth;
+		this.imageHeight = imageHeight;
 		widthConstant = pixelConstant(imageWidth, realUB, realLB);
 		heightConstant = pixelConstant(imageHeight, imaginaryUB, imaginaryLB);
 	}
@@ -83,5 +87,7 @@ public abstract class Fractal {
 	protected double pixelConstant(int pixels, double upperBound, double lowerBound) {
 		return (upperBound - lowerBound) / pixels;
 	}
+	
+	public abstract BufferedImage generate(int iterations);
 
 }

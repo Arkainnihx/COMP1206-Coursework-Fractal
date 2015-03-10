@@ -5,11 +5,9 @@ import java.awt.image.BufferedImage;
 
 public class Julia extends Fractal {
 	
-	Complex c = new Complex(0,0);
+	private Complex c = new Complex(0,0);
 
-	public BufferedImage generate(int imageWidth, int imageHeight, Complex userSelectedPoint, int iterations) {
-		widthConstant = pixelConstant(imageWidth, realUB, realLB);
-		heightConstant = pixelConstant(imageHeight, imaginaryUB, imaginaryLB);
+	public BufferedImage generate(int iterations) {
 		BufferedImage image = new BufferedImage(imageWidth, imageHeight, BufferedImage.TYPE_INT_ARGB);
 		int xCount = 0, yCount = 0;
 		for (yCount = imageHeight - 1; yCount >= 0; yCount--) {
@@ -29,6 +27,10 @@ public class Julia extends Fractal {
 			count++;
 		}
 		return colourPoint(z, count, iterations);
+	}
+
+	public void setC(Complex c) {
+		this.c = c;
 	}
 
 }
