@@ -15,6 +15,7 @@ import java.awt.event.ComponentListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
+import java.util.Stack;
 
 import javax.swing.JComponent;
 import javax.swing.JFrame;
@@ -64,25 +65,32 @@ public class FractalFrame extends JFrame {
 		MouseAdapter mainPanelMouseListener = new MouseAdapter() {
 			private Point prevMouseCoords = new Point();
 			private boolean isDragged = false;
+			private Stack<double[]> zoomStack = new Stack<double[]>();
 
 			public void mouseClicked(MouseEvent e) {
-				userSelectedPoint = pnlMainFractal.fractal.imagePointToComplex(e.getX(), e.getY());
-				julia.setC(userSelectedPoint);
-				txtPointX.setText(String.valueOf(roundDouble(userSelectedPoint.getReal(), 5)));
-				txtPointY.setText(String.valueOf(roundDouble(userSelectedPoint.getImaginary(), 5)));
-				pnlSideFractal.repaint();
+				if (e.getButton() == MouseEvent.BUTTON1) {
+					userSelectedPoint = pnlMainFractal.fractal.imagePointToComplex(e.getX(), e.getY());
+					julia.setC(userSelectedPoint);
+					txtPointX.setText(String.valueOf(roundDouble(userSelectedPoint.getReal(), 5)));
+					txtPointY.setText(String.valueOf(roundDouble(userSelectedPoint.getImaginary(), 5)));
+					pnlSideFractal.repaint();
+				} else {
+					
+				}
 			}
 
 			public void mousePressed(MouseEvent e) {
-				prevMouseCoords = e.getPoint();
+				if (e.getButton() == MouseEvent.BUTTON1) {
+					prevMouseCoords = e.getPoint();
+				}
 			}
 			
 			public void mouseDragged(MouseEvent e) {
-				isDragged = true;
+					isDragged = true;
 			}
 
 			public void mouseReleased(MouseEvent e) {
-				if (isDragged) {
+				if (e.getButton() == MouseEvent.BUTTON1 && isDragged) {
 					isDragged = false;
 					int xMin = (int) Math.min(prevMouseCoords.getX(), e.getPoint().getX());
 					int xMax = (int) Math.max(prevMouseCoords.getX(), e.getPoint().getX());
@@ -102,13 +110,13 @@ public class FractalFrame extends JFrame {
 				}
 			}
 
-//			public void mouseMoved(MouseEvent e) {
-//				userSelectedPoint = pnlMainFractal.fractal.imagePointToComplex(e.getX(), e.getY());
-//				julia.setC(userSelectedPoint);
-//				txtPointX.setText(String.valueOf(roundDouble(userSelectedPoint.getReal(), 4)));
-//				txtPointY.setText(String.valueOf(roundDouble(userSelectedPoint.getImaginary(), 4)));
-//				pnlSideFractal.repaint();
-//			}
+			public void mouseMoved(MouseEvent e) {
+				userSelectedPoint = pnlMainFractal.fractal.imagePointToComplex(e.getX(), e.getY());
+				julia.setC(userSelectedPoint);
+				txtPointX.setText(String.valueOf(roundDouble(userSelectedPoint.modulusSquared(), 5)));
+				txtPointY.setText(String.valueOf(roundDouble(userSelectedPoint.getImaginary(), 5)));
+				pnlSideFractal.repaint();
+			}
 		};
 
 		txtIterations.setHorizontalAlignment(JTextField.RIGHT);
@@ -215,6 +223,7 @@ public class FractalFrame extends JFrame {
 
 	public class FractalPanel extends JPanel {
 		private Fractal fractal;
+		private BufferedImage fractalImage;
 
 		public FractalPanel(Fractal fractal) {
 			this.fractal = fractal;
@@ -266,7 +275,7 @@ public class FractalFrame extends JFrame {
 				}
 
 				public void mouseReleased(MouseEvent e) {
-
+					
 				}
 			});
 
@@ -274,7 +283,7 @@ public class FractalFrame extends JFrame {
 		}
 
 		public void paintComponent(Graphics g) {
-			super.paint(g);
+			super.paintComponent(g);
 			Graphics2D g2 = (Graphics2D) g;
 			g2.setColor(Color.BLACK);
 			g2.drawRect(x, y, width, height);

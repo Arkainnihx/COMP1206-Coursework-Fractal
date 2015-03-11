@@ -7,8 +7,8 @@ public abstract class Fractal {
 
 	protected double realUB = 2d, realLB = -2d, imaginaryUB = 1.6d, imaginaryLB = -1.6d, widthConstant = 0d, heightConstant = 0d;
 	protected int imageWidth = 0, imageHeight = 0;
-	protected ColourSpace gradient = new ColourSpace(Color.BLACK, Color.ORANGE, Color.WHITE, Color.BLUE, new Color(0, 0, 64));
-	protected boolean blackSet = false;
+	protected ColourSpace gradient = new ColourSpace(new Color(128, 0, 64), new Color(0, 64, 0), new Color(0, 0, 64));
+	protected boolean blackSet = true;
 
 	public double getRealUB() {
 		return realUB;
@@ -25,7 +25,7 @@ public abstract class Fractal {
 	public double getImaginaryLB() {
 		return imaginaryLB;
 	}
-	
+
 	public void setBounds(double realUB, double realLB, double imaginaryUB, double imaginaryLB) {
 		this.realUB = realUB;
 		this.realLB = realLB;
@@ -33,13 +33,13 @@ public abstract class Fractal {
 		this.imaginaryLB = imaginaryLB;
 		calculateConstants();
 	}
-	
+
 	public void setImageSize(int imageWidth, int imageHeight) {
 		this.imageWidth = imageWidth;
 		this.imageHeight = imageHeight;
 		calculateConstants();
 	}
-	
+
 	public double getWidthConstant() {
 		return widthConstant;
 	}
@@ -72,7 +72,7 @@ public abstract class Fractal {
 	public void setBlackSet(boolean blackSet) {
 		this.blackSet = blackSet;
 	}
-	
+
 	public Complex imagePointToComplex(int xPoint, int yPoint) {
 		return new Complex(realLB + (widthConstant * xPoint), imaginaryUB - (heightConstant * yPoint));
 	}
@@ -85,14 +85,15 @@ public abstract class Fractal {
 				return gradient.getStartPoint();
 			}
 		}
-		float v = (float) (1 - (n + 1 - Math.log(Math.log(Math.sqrt(z.modulusSquared())) / Math.log(2)) / Math.log(1000)) / maxN);
-		return gradient.generateColour(v);
+		double nu = Math.log(Math.log(z.modulus())) / Math.log(2);
+		double v = n + 1 - nu;
+		return gradient.smoothColouring(v, maxN);
 	}
 
 	protected double pixelConstant(int pixels, double upperBound, double lowerBound) {
 		return (upperBound - lowerBound) / pixels;
 	}
-	
+
 	public abstract BufferedImage generate(int iterations);
 
 }

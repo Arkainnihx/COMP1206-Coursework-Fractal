@@ -25,7 +25,7 @@ public class Julia extends Fractal {
 	private Color point(Complex d, int iterations) {
 		Complex z = new Complex(d.getReal(), d.getImaginary());
 		int count = 0;
-		while (z.modulusSquared() < 4 && count < iterations) {
+		while (z.modulusSquared() < Integer.MAX_VALUE && count < iterations) {
 			z = z.square().add(c);
 			count++;
 		}
