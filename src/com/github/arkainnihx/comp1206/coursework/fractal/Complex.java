@@ -2,9 +2,11 @@ package com.github.arkainnihx.comp1206.coursework.fractal;
 
 public class Complex {
 
-	private double real = 0d, imaginary = 0d;
+	private double real, imaginary;
 	
-	public Complex() {}
+	public Complex() {
+		this(0d, 0d);
+	}
 
 	public Complex(double real, double imaginary) {
 		this.real = real;
@@ -57,7 +59,7 @@ public class Complex {
 	
 	public Complex pow(int power) {
 		if (power == 0) {
-			return new Complex(0, 0);
+			return new Complex(1, 0);
 		}
 		if (power == 1) {
 			return this;
@@ -94,6 +96,10 @@ public class Complex {
 	
 	public Complex add(double real) {
 		return new Complex (this.real + real, imaginary);
+	}
+	
+	public Complex negative() {
+		return new Complex (-this.real, -this.imaginary);
 	}
 	
 	public Complex conjugate() {

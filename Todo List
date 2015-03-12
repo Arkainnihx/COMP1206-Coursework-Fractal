@@ -1,0 +1,7 @@
+Todo list:
+
+- Save Julia sets
+- Improve GUI
+- Implement zoom stack and key bindings
+- Implement other fractals and options to change fractals within program
+- Add action listener for userSelectedPoint text fields
