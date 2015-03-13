@@ -35,7 +35,7 @@ public class Fractal {
 	}
 	
 	public Fractal(FractalType type, boolean isJulia, double realUB, double realLB, double imaginaryUB, double imaginaryLB, double widthConstant,
-			double heightConstant, int imageWidth, int imageHeight, int order, ColourSpace gradient, boolean blackSet,
+			double heightConstant, int imageWidth, int imageHeight, int order, ColourSpace gradient, boolean isBlackSet,
 			Complex juliaAnchor) {
 		this.type = type;
 		this.isJulia = isJulia;
@@ -49,8 +49,27 @@ public class Fractal {
 		this.imageHeight = imageHeight;
 		this.order = order;
 		this.gradient = gradient;
-		this.isBlackSet = blackSet;
+		this.isBlackSet = isBlackSet;
 		this.juliaAnchor = juliaAnchor;
+		
+		
+	}
+	
+	public Fractal(Fractal fractal) {
+		this.type = fractal.getType();
+		this.isJulia = fractal.isJulia();
+		this.realUB = fractal.getRealUB();
+		this.realLB = fractal.getRealLB();
+		this.imaginaryUB = fractal.getImaginaryUB();
+		this.imaginaryLB = fractal.getImaginaryLB();
+		this.widthConstant = fractal.getWidthConstant();
+		this.heightConstant = fractal.getHeightConstant();
+		this.imageWidth = fractal.getImageWidth();
+		this.imageHeight = fractal.getImageHeight();
+		this.order = fractal.getOrder();
+		this.gradient = fractal.getGradient();
+		this.isBlackSet = fractal.isBlackSet();
+		this.juliaAnchor = fractal.getJuliaAnchor();
 	}
 	
 	public FractalType getType() {
@@ -84,6 +103,10 @@ public class Fractal {
 	public double getImaginaryLB() {
 		return imaginaryLB;
 	}
+	
+	public void resetBounds() {
+		setBounds(2d, -2d, 1.6d, -1.6d);
+	}
 
 	public void setBounds(double realUB, double realLB, double imaginaryUB, double imaginaryLB) {
 		this.realUB = realUB;
@@ -105,6 +128,14 @@ public class Fractal {
 
 	public double getHeightConstant() {
 		return heightConstant;
+	}
+
+	public int getImageWidth() {
+		return imageWidth;
+	}
+
+	public int getImageHeight() {
+		return imageHeight;
 	}
 
 	private void calculateConstants() {

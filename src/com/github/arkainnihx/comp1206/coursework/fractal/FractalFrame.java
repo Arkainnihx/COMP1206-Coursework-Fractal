@@ -12,13 +12,21 @@ import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Stack;
 
+import javax.swing.JButton;
+import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.ListSelectionModel;
 import javax.swing.UIManager;
 
 @SuppressWarnings("serial")
@@ -47,6 +55,7 @@ public class FractalFrame extends JFrame {
 		JPanel pnlSideBarCenter = new JPanel();
 		JPanel pnlMathsBounds = new JPanel();
 		JPanel pnlComplexPoint = new JPanel();
+		JPanel pnlButtons = new JPanel();
 		final JTextField txtIterations = new JTextField(5);
 		final JTextField txtRealUB = new JTextField(8);
 		final JTextField txtRealLB = new JTextField(8);
@@ -54,6 +63,10 @@ public class FractalFrame extends JFrame {
 		final JTextField txtImaginaryLB = new JTextField(8);
 		final JTextField txtPointReal = new JTextField(5);
 		final JTextField txtPointImaginary = new JTextField(5);
+		JButton btnSave = new JButton("Save");
+		JButton btnLoad = new JButton("Load");
+		JButton btnExport = new JButton("Export");
+		JButton btnSwap = new JButton("Swap");
 		ActionListener setMathboundsListener = new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				pnlMainFractal.fractal.setBounds(Double.parseDouble(txtRealUB.getText()),
@@ -97,26 +110,29 @@ public class FractalFrame extends JFrame {
 					int xMax = (int) Math.max(prevMouseCoords.getX(), e.getPoint().getX());
 					int yMin = (int) Math.min(prevMouseCoords.getY(), e.getPoint().getY());
 					int yMax = (int) Math.max(prevMouseCoords.getY(), e.getPoint().getY());
-					Point topRight = new Point(xMax, yMin);
-					Point bottomLeft = new Point(xMin, yMax);
-					Complex upperBounds = pnlMainFractal.fractal.imagePointToComplex(topRight.x, topRight.y);
-					Complex lowerBounds = pnlMainFractal.fractal.imagePointToComplex(bottomLeft.x, bottomLeft.y);
-					txtRealUB.setText(String.valueOf(roundDouble(upperBounds.getReal(), 9)));
-					txtRealLB.setText(String.valueOf(roundDouble(lowerBounds.getReal(), 9)));
-					txtImaginaryUB.setText(String.valueOf(roundDouble(upperBounds.getImaginary(), 9)));
-					txtImaginaryLB.setText(String.valueOf(roundDouble(lowerBounds.getImaginary(), 9)));
-					pnlMainFractal.fractal.setBounds(upperBounds.getReal(), lowerBounds.getReal(), upperBounds.getImaginary(),
-							lowerBounds.getImaginary());
+					if (xMax - xMin > 8 || yMax - yMin > 8) {
+						Point topRight = new Point(xMax, yMin);
+						Point bottomLeft = new Point(xMin, yMax);
+						Complex upperBounds = pnlMainFractal.fractal.imagePointToComplex(topRight.x, topRight.y);
+						Complex lowerBounds = pnlMainFractal.fractal.imagePointToComplex(bottomLeft.x, bottomLeft.y);
+						txtRealUB.setText(String.valueOf(roundDouble(upperBounds.getReal(), 9)));
+						txtRealLB.setText(String.valueOf(roundDouble(lowerBounds.getReal(), 9)));
+						txtImaginaryUB.setText(String.valueOf(roundDouble(upperBounds.getImaginary(), 9)));
+						txtImaginaryLB.setText(String.valueOf(roundDouble(lowerBounds.getImaginary(), 9)));
+						pnlMainFractal.fractal.setBounds(upperBounds.getReal(), lowerBounds.getReal(),
+								upperBounds.getImaginary(), lowerBounds.getImaginary());
+
+					}
 					pnlMainFractal.repaint();
 				}
 			}
-			public void mouseMoved(MouseEvent e) {
-				userSelectedPoint = pnlMainFractal.fractal.imagePointToComplex(e.getX(), e.getY());
-				pnlSideFractal.fractal.setJuliaAnchor(userSelectedPoint);
-				txtPointReal.setText(String.valueOf(roundDouble(userSelectedPoint.modulusSquared(), 5)));
-				txtPointImaginary.setText(String.valueOf(roundDouble(userSelectedPoint.getImaginary(), 5)));
-				pnlSideFractal.repaint();
-			}
+//			public void mouseMoved(MouseEvent e) {
+//				userSelectedPoint = pnlMainFractal.fractal.imagePointToComplex(e.getX(), e.getY());
+//				pnlSideFractal.fractal.setJuliaAnchor(userSelectedPoint);
+//				txtPointReal.setText(String.valueOf(roundDouble(userSelectedPoint.modulusSquared(), 5)));
+//				txtPointImaginary.setText(String.valueOf(roundDouble(userSelectedPoint.getImaginary(), 5)));
+//				pnlSideFractal.repaint();
+//			}
 		};
 
 		txtIterations.setHorizontalAlignment(JTextField.RIGHT);
@@ -150,7 +166,97 @@ public class FractalFrame extends JFrame {
 
 		txtPointImaginary.setHorizontalAlignment(JTextField.RIGHT);
 		txtPointImaginary.setText(String.valueOf(userSelectedPoint.getImaginary()));
+		
+		btnSave.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				int returnVal = JOptionPane.showOptionDialog(FractalFrame.this,
+						"Would you like to save the main fractal or the side fractal as a favourite?", "Choose Fractal",
+						JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, new Object[]{"Main", "Side"}, "Cancel");
+				if (returnVal != JOptionPane.CANCEL_OPTION || returnVal != JOptionPane.CLOSED_OPTION) {
+					String name = (String) JOptionPane.showInputDialog(FractalFrame.this, "Please enter a name:", "Enter name", JOptionPane.PLAIN_MESSAGE, null, null, "untitled");
+					switch (returnVal) {
+					case JOptionPane.YES_OPTION:
+						FractalState.writeToFile(new FractalState(name, pnlMainFractal.fractal));
+						break;
+					case JOptionPane.NO_OPTION:
+						FractalState.writeToFile(new FractalState(name, pnlSideFractal.fractal));
+						break;
+					}
+				}
+			}
+		});
+		btnLoad.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				try {
+					final ArrayList<FractalState> favouritesList = FractalState.readFileEntries();
+					JDialog loadFrame = new JDialog(FractalFrame.this, "Load Fractal", true);
+					JPanel loadPanel = new JPanel() {
+						{
+							final ArrayList<String> favouritesNames = new ArrayList<String>();
+							for (FractalState fs: favouritesList) {
+								favouritesNames.add(fs.getName());
+							}
+							final JList lstFavouritesNames = new JList(favouritesNames.toArray());
+							JButton btnOK = new JButton("OK");
+							
+							lstFavouritesNames.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+							lstFavouritesNames.setLayoutOrientation(JList.VERTICAL);
+							lstFavouritesNames.setPreferredSize(new Dimension(300, 150));
+							
+							btnOK.addActionListener(new ActionListener() {
+								public void actionPerformed(ActionEvent e) {
+									if (lstFavouritesNames.getSelectedValue() == null) {
+										lstFavouritesNames.setSelectedIndex(0);
+									}
+									String name = (String) lstFavouritesNames.getSelectedValue();
+									Fractal loadedFractal = null;
+									for (int count = 0; count < favouritesList.size(); count++) {
+										if (favouritesList.get(count).getName().equals(name)) {
+											FractalState fs = favouritesList.get(count);
+										}
+									}
+									Fractal altFractal = new Fractal(loadedFractal);
+									altFractal.setJulia(!altFractal.isJulia());
+									altFractal.resetBounds();
+									pnlMainFractal.fractal = loadedFractal;
+									pnlSideFractal.fractal = altFractal;
+									pnlMainFractal.repaint();
+									pnlSideFractal.repaint();
+								}
+							});
+							this.add(lstFavouritesNames);
+							this.add(btnOK);
+						}
+					};
+					loadFrame.setSize(new Dimension(300, 230));
+					loadFrame.setContentPane(loadPanel);
+					loadFrame.setVisible(true);
+				} catch (IOException e1) {
+					e1.printStackTrace();
+				} catch (ClassNotFoundException e1) {
+					e1.printStackTrace();
+				}
 
+			}
+		});
+		btnExport.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				
+			}
+		});
+		btnSwap.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				Fractal temp = pnlMainFractal.fractal;
+				pnlMainFractal.fractal = pnlSideFractal.fractal;
+				pnlSideFractal.fractal = temp;
+				pnlMainFractal.fractal.setImageSize(pnlMainFractal.getWidth(), pnlMainFractal.getHeight());
+				pnlSideFractal.fractal.setImageSize(pnlSideFractal.getWidth(), pnlSideFractal.getHeight());
+				pnlSideFractal.fractal.resetBounds();
+				pnlMainFractal.repaint();
+				pnlSideFractal.repaint();
+			}
+			
+		});
 		pnlMainFractal.addMouseListener(mainPanelMouseListener);
 		pnlMainFractal.addMouseMotionListener(mainPanelMouseListener);
 
@@ -172,12 +278,18 @@ public class FractalFrame extends JFrame {
 		pnlComplexPoint.add(new JLabel("Selected c ="));
 		pnlComplexPoint.add(txtPointReal);
 		pnlComplexPoint.add(txtPointImaginary);
+		
+		pnlButtons.add(btnSave);
+		pnlButtons.add(btnLoad);
+		pnlButtons.add(btnExport);
+		pnlButtons.add(btnSwap);
 
 		pnlSideBarNorth.add(pnlSideFractal);
 
 		pnlSideBarCenter.setPreferredSize(pnlSideFractal.getPreferredSize());
 		pnlSideBarCenter.add(pnlMathsBounds);
 		pnlSideBarCenter.add(pnlComplexPoint);
+		pnlSideBarCenter.add(pnlButtons);
 
 		pnlSideBar.setLayout(new BorderLayout());
 		pnlSideBar.add(pnlSideBarNorth, BorderLayout.NORTH);
@@ -194,10 +306,6 @@ public class FractalFrame extends JFrame {
 		this.setExtendedState(MAXIMIZED_BOTH);
 		this.setVisible(true);
 
-	}
-	
-	private void swapFractals() {
-		
 	}
 
 	private double roundDouble(double value, int pow) {

@@ -1,8 +1,11 @@
 package com.github.arkainnihx.comp1206.coursework.fractal;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -12,6 +15,7 @@ import com.github.arkainnihx.comp1206.coursework.fractals.FractalType;
 public class FractalState implements Serializable {
 	
 	private static final long serialVersionUID = 4953406325214274877L;
+	private String name;
 	private FractalType type;
 	private boolean isJulia;
 	private double realUB, realLB, imaginaryUB, imaginaryLB;
@@ -21,6 +25,7 @@ public class FractalState implements Serializable {
 	private Complex juliaAnchor;
 	
 	public FractalState(String name, Fractal fractal) {
+		this.name = name;
 		this.type = fractal.getType();
 		this.isJulia = fractal.isJulia();
 		this.realUB = fractal.getRealUB();
@@ -52,13 +57,23 @@ public class FractalState implements Serializable {
 		}	
 	}
 	
-	public static ArrayList<FractalState> readFileEntries() {
-		
+	public static ArrayList<FractalState> readFileEntries() throws IOException, ClassNotFoundException {
+		ObjectInputStream objectReader = new ObjectInputStream(new FileInputStream("favourites.ser"));
+		ArrayList<FractalState> favouritesList = new ArrayList<FractalState>();
+		while (objectReader.available() > 0) {
+			favouritesList.add((FractalState) objectReader.readObject());
+		}
+		objectReader.close();
+		return favouritesList;
 	}
 	
 	public Fractal convertToFractal() {
 		return new Fractal(this.type, this.isJulia, this.realUB, this.realLB, this.imaginaryUB, this.imaginaryLB, 0, 0, 0, 0,
 				this.order, this.gradient, this.isBlackSet, this.juliaAnchor);
+	}
+	
+	public String getName() {
+		return name;
 	}
 
 }
